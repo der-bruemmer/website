@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html >
+<head>
+  <title>NLP Interchange Format (NIF) 2.0 - Corpus conversion tutorial</title>
+  <link href="http://www.w3.org/StyleSheets/TR/base" rel="stylesheet" type="text/css" />
+  <link href="page/main.css" rel="stylesheet" type="text/css" />
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src="page/js/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="page/js/bootstrap/bootstrap.min.css"/>
+  <script type="text/javascript" src="page/js/index.js"></script>
+  <script>
+     $(document).ready(function(){
+            // all you need to get started
+            $('pre').litelighter({style:'dark'});
+
+        });
+    $(function(){
+      $("#about").load("http://persistence.uni-leipzig.org/nlp2rdf/specification/about.html");
+      
+    });
+    </script>
+</head>
+<body bgcolor="#FFFFFF">	
+<p>
+<!--a href="/"><img border="0" alt="W3C" src="/Icons/w3c_home" /></a-->
+</p>
+    <h1>NLP Interchange Format (NIF) 2.0 - Corpus conversion tutorial</h1>
+    
+<p>This document gives a quick overview over important concepts of NIF and how to describe language resources with them. As an example, we will look at an XML version of the <a href="http://icame.uib.no/brown/bcm.html">Brown corpus</a>.</p>
+
+<p>The core classes of NIF important to this tutorial are:
+<ul>
+<li><b>Context:</b> A string that serves as context for its substrings. It usually describes the whole document's text and contains it in the nif:isString property.</li>
+<li><b>String:</b> A string contained in the document, distinguished by its relevant Context, beginIndex and endIndex.</li>
+<li><b>Sentence:</b> A String which represents a sentence.</li>
+<li><b>Phrase:</b> A String which represents a phrase.</li>
+<li><b>Word:</b> A String which represents a single word.</li>
+</ul>
+</p>
+
+<p>Looking at our <a href="http://brown.nlp2rdf.org/corpus/">mirror of the Brown corpus</a>, we can see there are 500 XML documents. Every document contains some metadata as well as a number of sentences with annotated words, including their part of speech. Consider this example, which is the first sentence of the first document of the corpus:</p> 
+
+<pre>
+The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced `` no evidence '' that any irregularities took place .
+</pre>
+
+<h2>URI syntax</h2>
+
+<p>The URIs follow the <a href="http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html">NIF public API specification</a>.</p>
+
+<h2>Context</h2>
+
+<p>The Context represents the whole document. It serves as a reference point to all other substrings. It <b>necessarily</b> has a <b>nif:isString</b> property which contains the string content of the document, cleaned from any markup. In our case it looks like this:</p>
+
+<pre>:http://brown.nlp2rdf.org/corpus/a01.xml#char=0,164
+        a nif:String , nif:Context , nif:RFC5147String ;
+        nif:isString """The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced `` no evidence '' that any irregularities took place . [...]"""^^xsd:string ;
+        nif:beginIndex "0"^^xsd:nonNegativeInteger ;
+        nif:endIndex "164"^^xsd:nonNegativeInteger ;
+        nif:sourceUrl &lt;http://icame.uib.no/brown/bcm.html&gt; .
+</pre>
+
+<p>It is important to note, that the nif:beginIndex of the Context always is 0, because it represents the whole document. The nif:endIndex simply is the length of the string.</p>
+
+<h2>Sentences, Words and other strings</h2>
+
+<p>Substrings of the Context can be anything from a single word to sentences and paragraphs. They link to the relevant Context resource via <b>nif:referenceContext</b>. Beginning and end indexes always refer to the string represented by the Context's nif:isString property.</p>
+
+<p>The first <b>sentence</b> of our document would be presented like this:</p>
+<pre>
+:http://brown.nlp2rdf.org/corpus/a01.xml#char=0,158
+        a nif:String , nif:Sentence , nif:RFC5147String ;
+        nif:anchorOf """The Fulton County Grand Jury said Friday an investigation of Atlanta's recent primary election produced `` no evidence '' that any irregularities took place . """^^xsd:string ;
+        nif:referenceContext :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,164 ;
+        nif:nextSentence :http://brown.nlp2rdf.org/corpus/a01.xml#char=158,164 ;
+        nif:beginIndex "0"^^xsd:nonNegativeInteger ;
+        nif:endIndex "158"^^xsd:nonNegativeInteger .
+</pre>
+
+<p>The nif:nextSentence property is the only one in here not mandatory. Nevertheless, it is encouraged to use it to provide an easy way of traversing sentences in order.</p>
+
+<p>The same is generally true for <b>words:</b> </p>
+
+<pre>
+:http://brown.nlp2rdf.org/corpus/a01.xml#char=0,3
+        a nif:String , nif:Word , nif:RFC5147String ;
+        nif:anchorOf "The"^^xsd:string ;
+        nif:referenceContext :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,164 ;
+        <b>nif:oliaLink brown:AT</b> ;
+        nif:nextWord :http://brown.nlp2rdf.org/corpus/a01.xml#char=4,10 ;
+        nif:sentence :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,158 ;
+        nif:beginIndex "0"^^xsd:nonNegativeInteger ;
+        nif:endIndex "3"^^xsd:nonNegativeInteger .
+</pre>
+
+<p>A noteworthy difference is the <b>nif:oliaLink</b>. You can read about OLiA <a href="http://olia.nlp2rdf.org/">here</a>. In general, it is a set of ontologies that map corpus or tool specific annotations to a reference model. We use it to provide additional interoperability between disparate tagsets. To include these, visit the <a href="http://olia.nlp2rdf.org/">OLiA page</a> and search for the annotation model matching your tagset. You can assign its URI to a namespace of your choice:</p>
+
+<pre>@prefix brown: &lt;http://purl.org/olia/brown.owl#&gt; .
+</pre>
+
+<p>and simply add the tags from your corpus or tool via nif:oliaLink, like in the example above.</p>
+
+<h2>Named entities</h2>
+
+<p>Depending on how much information is available, named entities have to be annotated in different ways. In most cases, you will have the <b>coarse-grained class</b> the entity belongs to (i.e. if it is a Person, a Location, an Organization etc). To annotate these, please refer to the <a href="http://nerd.eurecom.fr/ontology#">NERD ontology</a>. Like in the case of OLiA, it maps different named entity types to single resources, increasing interoperability. The relevant property for annotation is <b>nif:taNerdCoreClassRef</b></p>
+
+<p>On the other hand, if you have a direct link to, for example, the respective DBpedia resource, you should of course link this one, too. Please use <b>itsrdf:taIdentRef</b> from the <a href="http://www.w3.org/TR/its20/">Internationalization Tag Set (ITS) Version 2.0</a> for this purpose.</br>
+
+Although there are no named entities in the Brown corpus itself, we will add one for the sake of the example:</p>
+
+<pre>
+:http://brown.nlp2rdf.org/corpus/a01.xml#char=4,10
+	a nif:String , nif:Word , nif:RFC5147String ;
+	nif:anchorOf "Fulton"^^xsd:string ;
+	nif:referenceContext :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,164 ;
+	nif:oliaLink brown:NP ;
+	nif:previousWord :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,3 ;
+	nif:nextWord :http://brown.nlp2rdf.org/corpus/a01.xml#char=11,17 ;
+	nif:sentence :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,158 ;
+	nif:beginIndex "623"^^xsd:nonNegativeInteger ;
+	nif:endIndex "629"^^xsd:nonNegativeInteger ;
+	<b>nif:taNerdCoreClassRef nerd:Location</b> ;
+	<b>itsrdf:taIdentRef &lt;http://dbpedia.org/page/Fulton_County,_Georgia&gt;</b> .</pre>
+</body>
+</html>
+
+
+
+
