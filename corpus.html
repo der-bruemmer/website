@@ -104,7 +104,7 @@ The Fulton County Grand Jury said Friday an investigation of Atlanta's recent pr
 
 <h2>Named entities</h2>
 
-<p>Depending on how much information is available, named entities have to be annotated in different ways. In most cases, you will have the <b>coarse-grained class</b> the entity belongs to (i.e. if it is a Person, a Location, an Organization etc). To annotate these, please refer to the <a href="http://nerd.eurecom.fr/ontology#">NERD ontology</a>. Like in the case of OLiA, it maps different named entity types to single resources, increasing interoperability. The relevant property for annotation is <b>nif:taNerdCoreClassRef</b></p>
+<p>Depending on how much information is available, named entities have to be annotated in different ways. In most cases, you will have the <b>coarse-grained class</b> the entity belongs to (i.e. if it is a Person, a Location, an Organization etc). To annotate these, please refer to the <a href="http://nerd.eurecom.fr/ontology#">NERD ontology</a>. Like in the case of OLiA, it maps different named entity types to single resources, increasing interoperability. The relevant property for annotation is <b>nif:taNerdCoreClassRef</b>.</p>
 
 <p>On the other hand, if you have a direct link to, for example, the respective DBpedia resource, you should of course link this one, too. Please use <b>itsrdf:taIdentRef</b> from the <a href="http://www.w3.org/TR/its20/">Internationalization Tag Set (ITS) Version 2.0</a> for this purpose.</br>
 
@@ -119,8 +119,8 @@ Although there are no named entities in the Brown corpus itself, we will add one
 	nif:previousWord :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,3 ;
 	nif:nextWord :http://brown.nlp2rdf.org/corpus/a01.xml#char=11,17 ;
 	nif:sentence :http://brown.nlp2rdf.org/corpus/a01.xml#char=0,158 ;
-	nif:beginIndex "623"^^xsd:nonNegativeInteger ;
-	nif:endIndex "629"^^xsd:nonNegativeInteger ;
+	nif:beginIndex "4"^^xsd:nonNegativeInteger ;
+	nif:endIndex "10"^^xsd:nonNegativeInteger ;
 	<b>nif:taNerdCoreClassRef nerd:Location</b> ;
 	<b>itsrdf:taIdentRef &lt;http://dbpedia.org/page/Fulton_County,_Georgia&gt;</b> .</pre>
 </body>
